@@ -9,25 +9,77 @@ import XCTest
 
 final class ToDoApp_Tests_UITests: XCTestCase {
 
+    var app: XCUIApplication!
+    
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
+       
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+        app = XCUIApplication()
+        app.launchArguments.append("--UITesting")
+        app.launch()
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
+        func testExample() throws {
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+            app.activate()
+            XCTAssertTrue(app.isOnMainView)
+            
+            app.navigationBars["ToDoApp"].buttons["Add"].tap()
+            app.textFields["Title"].tap()
+            app.textFields["Title"].typeText("Foo")
+
+            app.textFields["Location"].tap()
+            app.textFields["Location"].typeText("Bar")
+
+            app.textFields["Description"].tap()
+            app.textFields["Description"].typeText("Baz")
+
+            app.textFields["Date"].tap()
+            app.textFields["Date"].typeText("01.01.22")
+
+            app.textFields["Address"].tap()
+            app.textFields["Address"].typeText("Astana")
+
+            XCTAssertFalse(app.isOnMainView)
+            app.buttons["Save"].tap()
+            
+    }
+    
+    func testWhenCellIsSwipedLeftDoneButtonAppeared() {
+        
+
+        app.activate()
+        XCTAssertTrue(app.isOnMainView)
+        
+        app.navigationBars["ToDoApp"].buttons["Add"].tap()
+        app.textFields["Title"].tap()
+        app.textFields["Title"].typeText("Foo")
+
+        app.textFields["Location"].tap()
+        app.textFields["Location"].typeText("Bar")
+
+        app.textFields["Description"].tap()
+        app.textFields["Description"].typeText("Baz")
+
+        app.textFields["Date"].tap()
+        app.textFields["Date"].typeText("01.01.22")
+
+        app.textFields["Address"].tap()
+        app.textFields["Address"].typeText("Astana")
+
+        XCTAssertFalse(app.isOnMainView)
+        app.buttons["Save"].tap()
+        
+        let tablesQuery = app.tables.cells
+        tablesQuery.element(boundBy: 0).swipeLeft()
+        
+        tablesQuery.element(boundBy: 0).buttons["Done"].tap()
+        
+        XCTAssertEqual(app.staticTexts.element(matching: .any, identifier: "date").label, "")
     }
 
     func testLaunchPerformance() throws {
@@ -36,6 +88,19 @@ final class ToDoApp_Tests_UITests: XCTestCase {
             measure(metrics: [XCTApplicationLaunchMetric()]) {
                 XCUIApplication().launch()
             }
+            
+        
+            
         }
+        
+    }
+    
+    
+}
+
+extension XCUIApplication {
+    
+    var isOnMainView: Bool {
+        return otherElements["mainView"].exists
     }
 }
